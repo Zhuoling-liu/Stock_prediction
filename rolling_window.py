@@ -5,12 +5,11 @@ from sklearn.linear_model import Ridge
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_squared_error
 
-# Import the data engine we built on Day 1
+
 from data_engine import get_cleaned_data
 
 class PredictiveEngine:
     """
-    【Predictive Core - Rolling Window Edition】
     The AI brain of the system.
     Implements:
     1. Hybrid Prediction (Ridge + Gradient Boosting)
@@ -19,7 +18,7 @@ class PredictiveEngine:
     
     def __init__(self):
         # 1. Linear Model (Ridge) - Captures linear trends
-        self.ridge_model = Ridge(alpha=1.0)
+        self.ridge_model = Ridge(alpha=2.0)
         
         # 2. Non-linear Model (Gradient Boosting) - Captures complex patterns
         self.gb_model = GradientBoostingRegressor(
@@ -48,7 +47,7 @@ class PredictiveEngine:
         Performs rigorous Walk-Forward Validation (Rolling Window) to calculate RMSE.
         Then retrains on FULL data for final deployment.
         """
-        print(f"⚡ Starting Rolling Window Validation ({n_splits} folds)...")
+        print(f" Starting Rolling Window Validation ({n_splits} folds)...")
         print("   (This mimics the '3-year train / 1-year test' methodology in the paper)")
 
         

@@ -7,7 +7,7 @@ def get_cleaned_data(start_date="2020-01-01", end_date="2026-01-01"):
     Fetches financial data from Stooq (No API Key required), performs feature engineering,
     and prepares the dataset for the machine learning model.
     """
-    print("\n🚀 Launching Stooq Global Data Source \...")
+    print("\n Launching Stooq Global Data Source \...")
     
     # --- 1. Define Stock Universe (12 Cross-sector Blue Chips) ---
     tickers = [
@@ -21,7 +21,7 @@ def get_cleaned_data(start_date="2020-01-01", end_date="2026-01-01"):
     all_features = []
     
     for i, ticker in enumerate(tickers):
-        print(f"[{i+1}/{len(tickers)}] 📡 Downloading: {ticker} ...")
+        print(f"[{i+1}/{len(tickers)}]  Downloading: {ticker} ...")
         try:
             # Fetch data using Stooq (Robust, free, no API key needed)
             df = web.DataReader(ticker, 'stooq', start=start_date, end=end_date)
@@ -29,8 +29,9 @@ def get_cleaned_data(start_date="2020-01-01", end_date="2026-01-01"):
             # reverse it to chronological order (oldest first) for correct calculations.
             price = df['Close'].iloc[::-1]
             
-            # --- 2. Feature Engineering ---
+            #  2. Feature Engineering 
             feat_df = pd.DataFrame(index=price.index)
+            feat_df['Close'] = price
             
             # A. Momentum Factors (Trend following)
             feat_df['mom_1m'] = price.pct_change(20) # 1-month return
@@ -81,7 +82,7 @@ def get_cleaned_data(start_date="2020-01-01", end_date="2026-01-01"):
         Q3 = full_df[col].quantile(0.95)
         full_df[col] = full_df[col].clip(lower=Q1, upper=Q3)
 
-    print(f"\n🎉 Dataset Built Successfully! Total Samples: {len(full_df)}")
+    print(f"\nDataset Built Successfully! Total Samples: {len(full_df)}")
     print(f"Universe: {full_df['ticker'].unique()}")
     
     return full_df[features], full_df['target_return'], full_df
