@@ -62,10 +62,10 @@ def get_cleaned_data(start_date="2020-01-01", end_date="2026-01-01"):
             print(f"✅ {ticker} processed successfully.")
             
         except Exception as e:
-            print(f"❌ Failed to download {ticker}: {e}")
+            print(f" Failed to download {ticker}: {e}")
 
     if not all_features:
-        print("\n❌ Critical Error: All downloads failed. Please check internet connection.")
+        print("\n Critical Error: All downloads failed. Please check internet connection.")
         return None, None, None
 
     # --- 3. Data Merging & Cleaning ---

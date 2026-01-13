@@ -43,7 +43,7 @@ class PredictiveEngine:
 
     def _date_aligned_split(self, X, n_splits=5, gap_days=20):
         """
-        🔥 Core Logic: Custom Time Series Splitter based on DATES, not ROWS.
+        Core Logic: Custom Time Series Splitter based on DATES, not ROWS.
         
         This solves two critical leakage problems in Panel Data:
         1. Intra-day Leakage: Ensures all tickers for the same date are ALWAYS kept together 
@@ -83,17 +83,17 @@ class PredictiveEngine:
         # 1. Force Sort & Align
         # Essential to prevent index mismatch errors during concatenation
         if not X.index.is_monotonic_increasing:
-            print("   ⚠️ Data not sorted! Sorting combined X and y...")
+            print("  Data not sorted! Sorting combined X and y...")
             combined = pd.concat([X, y], axis=1).sort_index()
             X = combined[X.columns]
             y = combined.iloc[:, -1]
 
-        # 2. 🔥 Create the Custom CV Generator
+        # 2. Create the Custom CV Generator
         # We convert it to a list to pass directly into GridSearchCV
         custom_cv = list(self._date_aligned_split(X, n_splits=3, gap_days=20))
 
         # --- A. Tune Ridge (Grid Search) ---
-        print("   🔹 Tuning Ridge Regression...")
+        print("    Tuning Ridge Regression...")
         ridge_search = GridSearchCV(
             estimator=Ridge(),
             param_grid={'alpha': [0.1, 1.0, 10.0, 50.0]},
@@ -103,10 +103,10 @@ class PredictiveEngine:
         )
         ridge_search.fit(X, y)
         self.ridge_model = ridge_search.best_estimator_
-        print(f"      ✅ Best Ridge Alpha: {ridge_search.best_params_}")
+        print(f"       Best Ridge Alpha: {ridge_search.best_params_}")
 
         # --- B. Tune Gradient Boosting (Randomized Search) ---
-        print("   🔹 Tuning Gradient Boosting...")
+        print("   Tuning Gradient Boosting...")
         gb_search = RandomizedSearchCV(
             estimator=GradientBoostingRegressor(random_state=42),
             param_distributions={
@@ -122,13 +122,13 @@ class PredictiveEngine:
         )
         gb_search.fit(X, y)
         self.gb_model = gb_search.best_estimator_
-        print(f"      ✅ Best GB Params: {gb_search.best_params_}")
+        print(f"       Best GB Params: {gb_search.best_params_}")
 
     def train_rolling_window(self, X, y, n_splits=5):
         """
         Performs rigorous Walk-Forward Validation using the Date-Aligned Splitter.
         """
-        print(f"\n📉 Starting Rolling Window Validation (Date-Aligned)...")
+        print(f"\nStarting Rolling Window Validation (Date-Aligned)...")
         
         # 1. Ensure Data is Sorted
         if not X.index.is_monotonic_increasing:
@@ -136,7 +136,7 @@ class PredictiveEngine:
             X = combined[X.columns]
             y = combined.iloc[:, -1]
 
-        # 2. 🔥 Initialize Custom CV Generator
+        # 2.  Initialize Custom CV Generator
         custom_cv = self._date_aligned_split(X, n_splits=n_splits, gap_days=20)
         
         hybrid_scores = []
@@ -165,10 +165,10 @@ class PredictiveEngine:
             
         # 4. Store Baseline Uncertainty
         self.model_metrics['hybrid_rmse'] = np.mean(hybrid_scores)
-        print(f"✅ Robust RMSE: {self.model_metrics['hybrid_rmse']:.5f}")
+        print(f" Robust RMSE: {self.model_metrics['hybrid_rmse']:.5f}")
         
         # 5. Full Retrain for Deployment
-        print("🔄 Retraining final models on ALL historical data...")
+        print(" Retraining final models on ALL historical data...")
         self.ridge_model.fit(X, y)
         self.gb_model.fit(X, y)
         self.is_fitted = True
@@ -215,7 +215,7 @@ if __name__ == "__main__":
         # Step 2: Evaluate Performance (Rolling Window)
         agent.train_rolling_window(X, y, n_splits=5)
         
-        print("\n🔮 Forecasting for latest available data:")
+        print("\n Forecasting for latest available data:")
         
         # Get latest data for each ticker for final prediction
         latest_full_data = df.sort_index().groupby('ticker').tail(1)
